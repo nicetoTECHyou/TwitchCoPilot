@@ -1,5 +1,42 @@
 # TwitchCoPilot — Änderungsprotokoll / Changelog
 
+## v4.4.0 (2026-04-11)
+
+### 🆕 Feature: Heading-Up Top-Down Tracking (2D-Navigationsansicht)
+
+- **Neues Verhalten**: Das Fahrzeug wird jetzt WÄHREND der Navigation IMMER verfolgt — egal ob 3D-View aktiv ist oder nicht. Bisher stoppte das Tracking komplett wenn Follow-Cam (3D) deaktiviert wurde.
+- **3D-Modus AN** (Follow-Cam Switch aktiv): Wie bisher — Perspektiv-Pitch, Heading-Up, geschwindigkeitsabhängiger Auto-Zoom.
+- **3D-Modus AUS** (Follow-Cam Switch aus): **NEU** — Top-Down-Ansicht (pitch=0), Karte automatisch in Fahrtrichtung ausgerichtet (Heading-Up), etwas weiter reingezoomt (followCamZoom + 1). Smooth Bearing-Lerp identisch zum 3D-Modus.
+- **Ursache für das Refactoring**: `useFollowCam` wurde nur aktiviert wenn `followCamEnabled === true` (Zeile 115). In MapContainer gab es ein rudimentäres Fallback-Centering ohne Bearing-Tracking. Das führte zu: kein Heading-Up in 2D, kein Zoom, kein Smooth-Lerp.
+- **Architektur-Änderung**: `useFollowCam` ist jetzt der alleinige Camera-Controller während der Navigation. Die Bedingung `followCamEnabled` steuert nur noch Pitch und Zoom-Verhalten, nicht mehr ob der Hook aktiv ist. Das doppelte Centering in MapContainer (Zeile 676-678) wurde entfernt.
+- **Cleanup**: Camera-Reset (bearing=0, pitch=0) passiert nur noch wenn die Navigation ENDET — nicht mehr wenn der 3D-Switch toggled. So wird beim Umschalten 3D→2D das Heading-Up nahtlos beibehalten.
+
+### Geänderte Dateien (Source)
+- `src/hooks/useFollowCam.ts` — Komplett refaktoriert: immer aktiv bei Nav, pitch/zoom je nach 3D-Modus
+- `src/components/map/MapContainer.tsx` — Doppeltes Centering entfernt, isDemoMode aus Destrukturierung entfernt
+- `VERSION` — v4.4.0
+- `package.json` — v4.4.0
+- `src/components/chat/TwitchChatManager.tsx` — `!version` → v4.4.0
+- `README.md` — Badge v4.4.0
+- `CHANGELOG.md` — v4.4.0
+
+## v4.3.5 (2026-04-11)
+
+### 🐛 Bug Fix: Route Selection Overlay schließt nicht bei "Navigation starten"
+
+- **Symptom**: Nach Klick auf "Navigation starten" im Route Selection Overlay bleibt das Overlay offen. Erst manuelles Schließen (X-Button) schließt es. Die Navigation startet korrekt im Hintergrund, aber das Overlay verdeckt den unteren Kartenbereich.
+- **Ursache**: Das Early-Return `if (!routeSelectionMode) return null;` auf Komponentenebene (Zeile 54) wurde VOR dem `AnimatePresence` ausgewertet. Wenn `setRouteSelectionMode(false)` aufgerufen wurde, returnte die Komponente sofort `null` — `AnimatePresence` bekam nie die Chance, die Exit-Animation (`exit={{ y: 100, opacity: 0 }}`) abzuspielen. Das Overlay verschwand zwar visuell (weil der State false wurde), aber der React-Tree wurde sofort gekappt ohne Animation.
+- **Fix 1**: Early-Return hinter `AnimatePresence` verschoben — die Komponente rendert jetzt IMMER den `AnimatePresence`-Wrapper, auch wenn `routeSelectionMode` false ist. Nur der Condition-Block `{routeSelectionMode && (...)}` steuert Sichtbarkeit, sodass `AnimatePresence` die Exit-Animation korrekt triggern kann.
+- **Fix 2**: `setHighlightedRouteIdx(-1)` zum `handleStartNav` hinzugefügt (Reset der Routen-Auswahl beim Navigations-Start).
+
+### Geänderte Dateien (Source)
+- `src/components/map/RouteSelectionOverlay.tsx` — Early-Return verschoben, highlightedRouteIdx-Reset
+- `VERSION` — v4.3.5
+- `package.json` — v4.3.5
+- `src/components/chat/TwitchChatManager.tsx` — `!version` → v4.3.5
+- `README.md` — Badge v4.3.5
+- `CHANGELOG.md` — v4.3.5
+
 ## v4.3.4 (2026-04-11)
 
 ### 🧹 Code Quality: ESLint Cleanup + Ungelesene Variablen entfernt
