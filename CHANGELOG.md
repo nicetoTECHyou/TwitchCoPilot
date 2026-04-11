@@ -1,5 +1,24 @@
 # TwitchCoPilot — Änderungsprotokoll / Changelog
 
+## v4.4.1 (2026-04-11)
+
+### 🐛 Bug Fix: Bot sendet keine TTS-Ansage mehr bei Routenstart
+
+- **Symptom**: Bei Klick auf "Navigation starten" wird keine TTS-Ansage mehr gesendet (weder per Web Speech API noch als Chat-Nachricht an Twitch).
+- **Ursache 1 — Double-Send Bug in useNavTTS**: Im "Navigation gestartet"-Block wurde die Chat-Nachricht ZWEIMAL gesendet: (1) explizit via `sendNavChat()` und (2) intern durch die `speak()`-Funktion die ebenfalls `sendNavChat()` aufruft. Bei aktiviertem TTS wurde die Nachricht doppelt an Twitch gesendet, was den Twitch Rate-Limiter triggern konnte und beide Nachrichten blockierte.
+  - **Fix**: Neue Funktion `speakOnly()` die NUR TTS enqueuet (ohne Chat). Der "Navigation gestartet"-Block verwendet jetzt `sendNavChat()` für Chat (immer) und `speakOnly()` für TTS (nur wenn aktiviert). Kein Double-Send mehr.
+- **Ursache 2 — voiceEnabled in connect()-Deps verursacht Bridge-Instabilität**: `voiceEnabled` war als Dependency der `connect()`-Funktion in TwitchChatManager registriert. Jedes Mal wenn der Mute-Button getoggled wurde, änderte sich `voiceEnabled` → `connect()` wurde neu erstellt → Bridge-UseEffect lief Cleanup (`_sendChatFn: undefined`) → Re-Register. In diesem Mikro-Gap zwischen Cleanup und Re-Register war `_sendChatFn` temporär `undefined`, sodass alle `sendNavChat()`-Aufrufe stillschweigend gedroppt wurden.
+  - **Fix**: `voiceEnabled` aus den Dependencies von `connect()` entfernt. Die beiden Event-Handler (`subscription`, `cheer`) die `voiceEnabled` prüfen, lesen jetzt den Wert via `useSettingsStore.getState().voiceEnabled` zur Laufzeit (call-time Store-Lesung). Die Bridge wird nicht mehr bei Mute-Toggle neu registriert — `_sendChatFn` bleibt stabil.
+- **Diagnostic-Logging**: Console-Log Statements hinzugefügt in `useNavTTS` (Navigation Started, TTS Enqueued/Skipped, sendNavChat Blocked) und in der Bridge-Registration (register/cleanup). Ermöglicht Fehlersuche via Browser-Console (F12).
+
+### Geänderte Dateien (Source)
+- `src/hooks/useNavTTS.ts` — Neue `speakOnly()` Funktion, Double-Send Fix, Diagnostic-Logging
+- `src/components/chat/TwitchChatManager.tsx` — `voiceEnabled` aus `connect()`-Deps entfernt, Store-Lesung at call-time, Bridge-Logging, `!version` → v4.4.1
+- `VERSION` — v4.4.1
+- `package.json` — v4.4.1
+- `README.md` — Badge v4.4.1
+- `CHANGELOG.md` — v4.4.1
+
 ## v4.4.0 (2026-04-11)
 
 ### 🆕 Feature: Heading-Up Top-Down Tracking (2D-Navigationsansicht)
