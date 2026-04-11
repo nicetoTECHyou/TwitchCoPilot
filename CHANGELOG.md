@@ -1,5 +1,32 @@
 # TwitchCoPilot — Änderungsprotokoll / Changelog
 
+## v4.3.3 (2026-04-11)
+
+### 🐛 Critical Bug Fix: Route-Overlay Durchsichtigkeit + Mobile Crash
+
+#### Bug 1: PC/Web — Overlay wird transparent beim Routen-Klick
+- **Symptom**: Nach Klick auf eine alternative Route im Auswahl-Overlay wird der Hintergrund des Fensters sofort durchsichtig. Die Inhalte bleiben sichtbar aber der Glass-Hintergrund verschwindet komplett.
+- **Ursache**: Die `.glass:hover` CSS-Regel in `globals.css` setzt den Hintergrund auf `rgba(255, 255, 255, 0.12)` (nahezu transparent). Da der Mauszeiger beim Klicken auf einen Button IMMER noch über dem `.glass`-Container schwebt, bleibt der `:hover`-State aktiv. Auf mobilen Geräten wird `:hover` nach einem Tap "sticky" — das Overlay wird dauerhaft transparent.
+- **Fix**: Neuer CSS-Klasse `.route-overlay-panel` mit gleicher Glassmorphism-Optik (0.92 Opacity) aber OHNE `:hover`-Effekt. Das Overlay bleibt jetzt immer voll sichtbar, egal ob gehovert oder nicht.
+
+#### Bug 2: Mobile — Sofortiger Crash nach Routenauswahl
+- **Symptom**: Auf mobilen Geräten (Android/iOS) stürzt die App sofort mit "Etwas ist schiefgelaufen" ab, wenn eine alternative Route im Overlay angetippt wird.
+- **Ursache 1**: `line-dasharray: [0, 0]` ist ein degenerierter Wert der auf mobilen OpenGL ES Implementierungen einen Fehler werfen kann. Der Wert `[0, 0]` bedeutet "0px Dash, 0px Gap" — auf Desktop-GPU ignoriert, auf mobilen WebGL aber potenziell fatal.
+- **Ursache 2**: Fehlendes Error-Handling in Map-useEffects. Jeder MapLibre-Fehler (z.B. `setData` mit ungültigen Koordinaten oder `setPaintProperty` mit ungültigen Werten) propagiert ungefangen zum ErrorBoundary → White Screen.
+- **Fix 1**: `line-dasharray` von `[0, 0]` auf `[1, 0]` geändert (1px Dash, 0px Gap → visuell identisch zur Solid-Line, aber gültiger Wert).
+- **Fix 2**: try-catch um den gesamten Route-Line-useEffect und den Highlight-useEffect in MapContainer.tsx. Map-Fehler werden jetzt als `console.warn` geloggt statt die gesamte App zum Absturz zu bringen.
+- **Fix 3**: Koordinaten-Validierung vor `setData()` — `NaN`/`undefined`-Werte werden durch `0` ersetzt.
+
+### Geänderte Dateien (Source)
+- `src/globals.css` — Neue `.route-overlay-panel` CSS-Klasse (glassmorphism ohne Hover)
+- `src/components/map/RouteSelectionOverlay.tsx` — `.glass` → `.route-overlay-panel`
+- `src/components/map/MapContainer.tsx` — try-catch in Route- + Highlight-useEffect, `[0,0]` → `[1,0]`, Koordinaten-Validierung
+- `VERSION` — v4.3.3
+- `package.json` — v4.3.3
+- `src/components/chat/TwitchChatManager.tsx` — `!version` → v4.3.3
+- `README.md` — Badge v4.3.3
+- `CHANGELOG.md` — v4.3.3
+
 ## v4.3.2 (2026-04-11)
 
 ### 🐛 Critical Bug Fix: App-Absturz beim Route-Button-Klick im Overlay
