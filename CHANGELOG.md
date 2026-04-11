@@ -1,5 +1,46 @@
 # TwitchCoPilot — Änderungsprotokoll / Changelog
 
+## v4.3.4 (2026-04-11)
+
+### 🧹 Code Quality: ESLint Cleanup + Ungelesene Variablen entfernt
+
+- **ESLint-Konfiguration aktualisiert**: Bisher waren ALLE Regeln deaktiviert (`"off"`). Jetzt aktiv: `@typescript-eslint/no-explicit-any` (warn), `@typescript-eslint/no-unused-vars` (warn mit `_`-Prefix-Ausnahme), `@typescript-eslint/no-non-null-assertion` (warn), `@typescript-eslint/prefer-as-const` (warn), `react-hooks/exhaustive-deps` (warn), `prefer-const` (warn), `no-debugger` (warn), `no-unreachable` (warn). Nur stilistische Regeln bleiben deaktiviert.
+- **20 ungenutzte Variablen entfernt/prefixiert** über 14 Dateien:
+  - Unnötige Imports entfernt: `Progress`, `Clock`, `HorizontalCoord`, `SyncMessage`, `useEffect` (SyncPanel)
+  - Unnötige Destrukturierungen bereinigt: `isDemoMode`, `currentSpeed`, `remainingDistance`, `ascent`, `descent`, `setGpsStatus`, `clearPOIs`, `deleteAlert`, `closeContextMenu`, `statusText`
+  - Ungelesene Zuweisungen prefixiert: `_tick`, `_isTwilight`, `_showAltRoutes`, `_actionTypes`, `_closestIdx`, `_T`, `_OmRad`
+- **6 `prefer-const` Fixes** in `astronomy.ts`: `let` → `const` für `gmst`, `L`, `g`, `M`, `F`
+- **11 `react-hooks/exhaustive-deps` Fixes** über 7 Dateien:
+  - Intentional fehlende Deps (Mount-only Effects, GPS-Updates die Loops verursachen würden): `// eslint-disable-next-line` Kommentare
+  - Überflüssige Deps entfernt: `language`, `isDemoMode` (NavigateTab), `activeVote?.isActive`, `tick` (VotingPanel)
+  - Fehlende aber korrekte Deps hinzugefügt: `sharedSetWeather` (WeatherWidget), `pendingWaypoints` (NavigateTab), `activeCategories` (POITab)
+- **Lint-Ergebnis**: 0 Errors, 57 Warnings (alle `no-explicit-any` — unvermeidbar bei tmi.js/MapLibre/PeerJS ohne TS-Typen + 2x `no-non-null-assertion`)
+
+### Geänderte Dateien (Source)
+- `eslint.config.mjs` — Regeln aktiviert
+- `src/components/chat/TwitchChatManager.tsx` — Unused vars, exhaustive-deps
+- `src/components/chat/VotingPanel.tsx` — Unused import, tick→_tick, deps cleanup
+- `src/components/map/MapContainer.tsx` — Unused var, exhaustive-deps
+- `src/components/map/SkyChart.tsx` — Unused import + var
+- `src/components/navigation/WeatherWidget.tsx` — exhaustive-deps
+- `src/components/overlay/OBSOverlayPage.tsx` — exhaustive-deps
+- `src/components/sidebar/SettingsPanel.tsx` — (keine inhaltlichen Änderungen)
+- `src/components/sidebar/tabs/NavigateTab.tsx` — Unused vars, deps cleanup
+- `src/components/sidebar/tabs/POITab.tsx` — Unused var, exhaustive-deps
+- `src/components/sidebar/tabs/RouteTab.tsx` — Unused import/var, exhaustive-deps
+- `src/components/sidebar/tabs/StreamerTab.tsx` — Unused var
+- `src/components/sync/SyncPanel.tsx` — Unused import
+- `src/hooks/use-toast.ts` — actionTypes→_actionTypes
+- `src/hooks/useLiveNavigation.ts` — closestIdx→_closestIdx
+- `src/hooks/useNavSync.ts` — Unused import
+- `src/lib/astronomy.ts` — prefer-const, unused vars
+- `src/lib/overpass.ts` — Unused var
+- `VERSION` — v4.3.4
+- `package.json` — v4.3.4
+- `src/components/chat/TwitchChatManager.tsx` — `!version` → v4.3.4
+- `README.md` — Badge v4.3.4
+- `CHANGELOG.md` — v4.3.4
+
 ## v4.3.3 (2026-04-11)
 
 ### 🐛 Critical Bug Fix: Route-Overlay Durchsichtigkeit + Mobile Crash
