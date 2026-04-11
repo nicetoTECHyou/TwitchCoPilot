@@ -1,5 +1,28 @@
 # TwitchCoPilot — Änderungsprotokoll / Changelog
 
+## v4.3.0 (2026-04-11)
+
+### 🐛 Critical Bug Fix: Fluid Route Selection UI — Map-Fokus-Überschreibung
+- **CRITICAL: Map fitBounds überschrieb combinedBounds während Route Selection Mode**: Nach der Routenberechnung wurden 3 Routen (Kürzeste, Schnellste, Sicherste) korrekt mit `combinedBounds` und Overlay-aware Padding (bottom: 200px) auf der Karte positioniert. Aber DANN triggerte der `route`-useEffect in MapContainer ein zweites `fitBounds` mit normalem Padding — ohne Berücksichtigung des Overlay-Bereichs. Die Karte sprang zurück und das Route Selection Overlay (unten am Kartenrand) verdeckte Teile der Routen.
+  - **Ursache**: Der `route`-useEffect (MapContainer.tsx Zeile 382) feuerte bei JEDER Route-Änderung, auch wenn `routeSelectionMode` aktiv war. Die `combinedBounds`-Logik in RouteTab.calculateRoute() (Zeile 646) wurde sofort danach durch das zweite `fitBounds` mit normalem Padding überschrieben.
+  - **Fix**: `routeSelectionMode` als Guard im fitBounds-Block hinzugefügt. Wenn Route Selection Mode aktiv ist, wird das fitBounds komplett übersprungen — die `combinedBounds` mit Overlay-Padding aus calculateRoute() bleibt erhalten.
+  - **Betroffen**: Desktop UND Mobile. Auf Mobile war das Problem besonders gravierend weil das Overlay einen größeren Teil des kleinen Bildschirms verdeckte und die Routen nicht vollständig sichtbar waren.
+  - **Effekt**: Karte bleibt korrekt auf alle Routen zentriert mit ausreichend Platz für das Route Selection Overlay am unteren Rand.
+
+### 🎨 Route Selection Overlay — Enhanced UX
+- **Overlay-Positionierung**: Von `fixed` auf `absolute` geändert — Overlay wird jetzt relativ zum `<main>` Container (Map-Bereich) positioniert statt relativ zum Viewport. Verhindert Positionierungs-Konflikte mit Sidebar auf Desktop.
+- **Staggered Animation**: Route-Cards erscheinen jetzt mit einer kaskadierenden Verzögerung (80ms pro Karte) statt gleichzeitig. Jede Karte slidet von unten hoch mit Framer Motion Spring-Animation.
+- **Close-Button**: Neues X-Icon (statt `Navigation rotate-180`) für klareres "Schließen"-Feedback.
+- **Breite**: Von `calc(100vw-2rem)` auf `calc(100%-2rem)` geändert — passt sich jetzt korrekt an den Kartenbereich an statt an den Viewport.
+
+### Geänderte Dateien (Source)
+- `src/components/map/MapContainer.tsx` — `routeSelectionMode` Guard im route-fitBounds useEffect
+- `src/components/map/RouteSelectionOverlay.tsx` — absolute Positionierung, staggered card animations, X Close-Button
+- `VERSION` — v4.3.0
+- `package.json` — v4.3.0
+- `src/components/chat/TwitchChatManager.tsx` — `!version` → v4.3.0
+- `CHANGELOG.md` — v4.3.0
+
 ## v4.2.1 (2026-04-11)
 
 ### 🎨 Complete Icon Redesign
