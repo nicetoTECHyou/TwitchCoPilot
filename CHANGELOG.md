@@ -1,5 +1,23 @@
 # TwitchCoPilot — Änderungsprotokoll / Changelog
 
+## v4.3.1 (2026-04-11)
+
+### 🐛 Bug Fix: Dokumentation-Versionen im Static-Tar inkonsistent
+- **dist/README.md enthielt alten Version-Badge (4.2.1)**: Die dist/README.md wurde aus upload/ kopiert welches noch die alte Version trug. Resultat: Source-Tar zeigte 4.3.0, Static-Tar zeigte 4.2.1 im README Badge.
+- **dist/Anleitung.md referenzierte alte Version (v4.2.1)**: Gleicher Copy-Fehler — die Anleitung im dist/ Ordner hatte veraltete Versionsreferenzen im Changelog-Kapitel-Titel.
+- **Fix**: Alle Dokumentations-Dateien (dist/README.md, dist/Anleitung.md, upload/README.md, upload/Anleitung.md, docs/Anleitung_TwitchCoPilot.md) auf v4.3.1 synchronisiert.
+- **Prozess-Änderung**: Zukünftig werden Dokumente NACH dem Version-Bump aus den aktuellen Source-Dateien kopiert, nicht aus dem upload/ Ordner.
+
+### Geänderte Dateien (Source)
+- `VERSION` — v4.3.1
+- `package.json` — v4.3.1
+- `src/components/chat/TwitchChatManager.tsx` — `!version` → v4.3.1
+- `README.md` — Badge v4.3.1
+- `CHANGELOG.md` — v4.3.1
+- `upload/README.md` — Badge v4.3.1
+- `upload/Anleitung.md` — Version-Referenzen v4.3.1
+- `docs/Anleitung_TwitchCoPilot.md` — Version-Referenzen v4.3.1
+
 ## v4.3.0 (2026-04-11)
 
 ### 🐛 Critical Bug Fix: Fluid Route Selection UI — Map-Fokus-Überschreibung

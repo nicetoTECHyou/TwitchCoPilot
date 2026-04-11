@@ -17,7 +17,7 @@
 [![MapLibre](https://img.shields.io/badge/MapLibre_GL-5.22-1AAC71?logo=maplibre&logoColor=white)](https://maplibre.org)
 [![Zustand](https://img.shields.io/badge/Zustand-5-764ABC?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJtMyAxMSAxOC02LTktMCIvPjxwYXRoIGQ9Im0zIDE1IDE4IDYtOSAwIi8+PC9zdmc+&logoColor=white)](https://github.com/pmndrs/zustand)
 [![tmi.js](https://img.shields.io/badge/tmi.js-1.8.5-5C3A7E)](https://github.com/tmijs/tmi.js)
-[![Version](https://img.shields.io/badge/Version-4.2.1-9146FF)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-4.3.1-9146FF)](./CHANGELOG.md)
 [![PWA Ready](https://img.shields.io/badge/PWA-Installable-9146FF?logo=pwa&logoColor=white)](https://web.dev/learn/pwa/)
 [![License](https://img.shields.io/badge/License-CC_BY_NC_SA_4.0-green)](#-lizenz)
 
