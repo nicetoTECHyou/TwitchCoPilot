@@ -1,6 +1,31 @@
 # TwitchCoPilot — Änderungsprotokoll / Changelog
 
-## v4.4.1 (2026-04-11)
+## v4.4.2 (2026-04-11)
+
+### 🐛 Bug Fix: 3 kritische Mobile-Navigation-Bugs
+
+#### Bug 1: "Eingabe widerrufen" Popup auf iPhone (GPS)
+- **Symptom**: Während der Navigation erscheinen auf dem iPhone wiederholt Popup-Meldungen "Eingabe widerrufen" / Standortzugriff wurde widerrufen. Zuvor (altes iPhone) trat das Problem nicht auf.
+- **Ursache**: Der `watchPosition` Error-Handler ignorierte Fehler Code 2 (POSITION_UNAVAILABLE) und Code 3 (TIMEOUT) komplett — der Watch lief weiter. Bei GPS-Signalverlust (Tunnel, schwacher Empfang) feuert der Watch kontinuierlich Errors. iOS interpretiert den persistenten Location-Access-Versuch als aggressive Zugriffsanfrage und zeigt System-Notifications ("Standortzugriff widerrufen").
+- **Fix**: Neuer Error-Handler mit Consecutive-Error-Counter. Nach 5 aufeinanderfolgenden Fehlern wird der Watch pausiert (gestoppt) und der GPS-Status auf "idle" gesetzt. Nach 10 Sekunden Cooldown wird der Watch automatisch neu gestartet (Auto-Reconnect). Zeigt dem Benutzer die Meldung "GPS-Signal verloren. Versuche automatisch neu zu verbinden..." statt iOS die Kontrolle zu überlassen. Bei Code 1 (PERMISSION_DENIED) wird der Watch sofort gestoppt — keine automatische Wiederholung.
+- **i18n**: Neue Keys `nav.gpsSignalLost` (DE: "⚠️ GPS-Signal verloren. Versuche automatisch neu zu verbinden...", EN: "⚠️ GPS signal lost. Reconnecting automatically...").
+
+#### Bug 2: GPS wird nicht automatisch bei Navigationsstart aktiviert
+- **Symptom**: Nach "Navigation starten" bleibt die GPS-Verfolgung inaktiv. Der Benutzer musste vorher manuell den GPS-Button klicken. Bei Nutzung des Route Selection Overlay (unterer Kartenrand) gab es GAR KEINE Möglichkeit, GPS zu aktivieren — die Navigation startete ohne GPS-Tracking.
+- **Ursache**: Weder `handleStartNav` in NavigateTab noch `handleStartNav` in RouteSelectionOverlay rufen `enableGPS()` auf. GPS musste immer separat aktiviert werden.
+- **Fix**: Neuer `useEffect` in NavigateSection der `isNavigating` überwacht. Beim Start der Navigation wird geprüft ob `gpsStatus === 'idle'` — wenn ja, wird `enableGPS()` automatisch aufgerufen. Ein Ref verhindert dass GPS mehrfach pro Navigationssession aktiviert wird. Wird die Navigation beendet, wird der Ref zurückgesetzt.
+
+#### Bug 3: Menü während Navigation blockiert (Mobile) — SEHR KRITISCH
+- **Symptom**: Auf dem Handy kann nach "Navigation starten" das Seitenmenü (Sidebar) nicht mehr geöffnet werden. Der Hamburger-Button reagiert nicht. Der Benutzer muss die Seite neu laden und alle Eingaben (Start, Ziel, Route) neu machen.
+- **Ursache**: Der Auto-Close `useEffect` in Sidebar.tsx hatte die Bedingung `(isNavigating || routeSelectionMode) && mobileOpen && !isDesktop`. Wenn der Benutzer den Hamburger-Button klickt → `mobileOpen` wird `true` → der Effect feuert → da `isNavigating` noch `true` ist, wird `mobileOpen` sofort wieder auf `false` gesetzt. Das Sidebar öffnet sich für einen Frame und schließt sofort wieder. Der Effekt tritt bei JEDER Status-Änderung auf, nicht nur beim Übergang.
+- **Fix**: Die Auto-Close-Logik prüft jetzt nur den ÜBERGANG (false→true), nicht den aktiven State. Neue Refs (`prevIsNavigatingRef`, `prevRouteSelRef`) tracken den vorherigen Wert. Der Sidebar wird nur beim ERSTEN Start der Navigation (oder Route Selection) automatisch geschlossen. Danach kann der Benutzer den Hamburger-Button normal bedienen — das Menu bleibt offen.
+
+### Geänderte Dateien (Source)
+- `src/components/sidebar/Sidebar.tsx` — Auto-Close nur bei State-Übergang (nicht während aktiv)
+- `src/components/sidebar/tabs/NavigateTab.tsx` — GPS Error-Handler mit Consecutive-Counter + Auto-Reconnect, GPS Auto-Aktivierung bei Navigationsstart
+- `src/lib/i18n.ts` — Neue Keys `nav.gpsSignalLost` (DE + EN)
+- `VERSION` — v4.4.2
+- `CHANGELOG.md` — v4.4.2
 
 ### 🐛 Bug Fix: Bot sendet keine TTS-Ansage mehr bei Routenstart
 
