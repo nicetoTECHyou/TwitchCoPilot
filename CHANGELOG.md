@@ -1,5 +1,26 @@
 # TwitchCoPilot — Änderungsprotokoll / Changelog
 
+## v4.3.2 (2026-04-11)
+
+### 🐛 Critical Bug Fix: App-Absturz beim Route-Button-Klick im Overlay
+- **CRITICAL: `line-dasharray` wurde als Layout-Property statt Paint-Property geändert**: Im Route Selection Mode wurde die hervorgehobene Alternativroute auf "solid" gesetzt via `map.setLayoutProperty(layerId, 'line-dasharray', [0, 0])`. Aber `line-dasharray` ist in MapLibre GL ein **Paint-Property**, kein Layout-Property. Der Aufruf von `setLayoutProperty` für ein Paint-Property wirft sofort einen Fehler (`TypeError: Cannot set layout property 'line-dasharray'`), der vom ErrorBoundary gefangen wird → "Etwas ist schiefgelaufen" White Screen.
+  - **Ursache**: Copy-Paste-Fehler bei der Implementierung des Highlighting-Codes. Alle anderen Properties (`line-color`, `line-width`, `line-opacity`) wurden korrekt über `setPaintProperty` gesetzt, nur `line-dasharray` nicht.
+  - **Fix**: `map.setLayoutProperty` → `map.setPaintProperty` für `line-dasharray`.
+  - **Bonus-Fix**: Beim Verlassen des Route Selection Modes wurde das Dash-Pattern nicht zurückgesetzt. Fehlende Zeile `map.setPaintProperty(layerId, 'line-dasharray', [4, 2])` hinzugefügt.
+  - **Betroffen**: Nur wenn eine ALTERNATIVE Route (idx > 0) im Overlay angeklickt wurde. Die Hauptroute (idx = 0) berührte den Code-Pfad nicht.
+
+### 🎨 UI: Framer Motion Staggered Animation entfernt
+- Die Route-Buttons im Overlay wurden von `<motion.button>` mit staggered Variant-Animation zurück zu einfachen `<button>` geändert. Reduziert Komplexität und potenzielle Kompatibilitätsprobleme auf mobilen Browsern.
+
+### Geänderte Dateien (Source)
+- `src/components/map/MapContainer.tsx` — `setLayoutProperty` → `setPaintProperty` für `line-dasharray`, Restore-Dash-Pattern hinzugefügt
+- `src/components/map/RouteSelectionOverlay.tsx` — Staggered Animation entfernt, einfache Buttons
+- `VERSION` — v4.3.2
+- `package.json` — v4.3.2
+- `src/components/chat/TwitchChatManager.tsx` — `!version` → v4.3.2
+- `README.md` — Badge v4.3.2
+- `CHANGELOG.md` — v4.3.2
+
 ## v4.3.1 (2026-04-11)
 
 ### 🐛 Bug Fix: Dokumentation-Versionen im Static-Tar inkonsistent
