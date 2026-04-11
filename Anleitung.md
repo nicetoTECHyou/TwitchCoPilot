@@ -27,7 +27,7 @@
 23. [Versionierung und Updates](#23-versionierung-und-updates)
 24. [Technischer Hintergrund — APIs und Services](#24-technischer-hintergrund--apis-und-services)
 25. [FAQ — Häufig gestellte Fragen](#25-faq--häufig-gestellte-fragen)
-26. [Neuerungen in v3.0.6–v4.2.0 (Changelog)](#26-neuerungen-in-v306v420-changelog)
+26. [Neuerungen in v3.0.6–v4.2.1 (Changelog)](#26-neuerungen-in-v306v420-changelog)
 
 ---
 
@@ -1152,7 +1152,7 @@ Wenn du deine eigene Version von TwitchCoPilot hosten möchtest, brauchst du **k
 
 Lade den Source-Tar von GitHub herunter:
 ```
-twitch-copilot-v4.2.0-source.tar
+twitch-copilot-v4.2.1-source.tar
 ```
 
 Oder klone das Repository:
@@ -1388,9 +1388,9 @@ Verwendet für: Nav-Pfeil, Drive-Info-Panel, Wetter-Widget, POI-Shortcuts, Votin
 Jede Version wird als **kombinierte Tar-Datei** veröffentlicht:
 
 ```
-twitch-copilot-v4.2.0.tar              ← Die EINE Datei zum Download
-├── twitch-copilot-v4.2.0-source.tar   ← Kompletter Source Code + README + CHANGELOG + VERSION
-├── twitch-copilot-v4.2.0-static.tar   ← Production Build (dist/) + README + CHANGELOG + VERSION
+twitch-copilot-v4.2.1.tar              ← Die EINE Datei zum Download
+├── twitch-copilot-v4.2.1-source.tar   ← Kompletter Source Code + README + CHANGELOG + VERSION
+├── twitch-copilot-v4.2.1-static.tar   ← Production Build (dist/) + README + CHANGELOG + VERSION
 ├── README.md                           ← Entwickler-Dokumentation
 ├── CHANGELOG.md                        ← Versionshistorie
 └── VERSION                             ← Versionsnummer
@@ -1537,15 +1537,25 @@ Built with 💜 for the bike streaming community
 
 ---
 
-## 26. Neuerungen in v3.0.6–v4.2.0 (Changelog)
+## 26. Neuerungen in v3.0.6–v4.2.1 (Changelog)
 
 Diese Sektion fasst alle wichtigen Änderungen zusammen, die seit Anleitung v3.0.5 eingefügt wurden.
+
+### v4.2.1 — Complete Icon Redesign
+
+- **Neues App-Icon (512x512):** Fahrrad-Wohnmobil im Flat-Comic-Style mit Twitch-Lila (#9146FF) Hintergrund und Neon-Grün (#39FF14) Navigations-Route. Bold Outlines, klare geometrische Formen — optimiert für PWA und App-Store.
+- **Neues Favicon (SVG + PNG):** Minimalistisches Fahrrad-Rad mit GPS-Pin in Neon-Grün auf Twitch-Lila. Squircle-Form, hochkontrast, erkennbar ab 32x32 Pixel.
+- **Neues Logo SVG:** TwitchCoPilot Branding mit Rad-Icon + Text (Twitch in Lila, CoPilot in Neon-Grün).
+- **Maskable Icon:** 192x192 Maskable-Variante mit Safe-Zone für Android Adaptive Icons.
+- **Apple Touch Icon:** 180x180 für iOS Home Screen.
+- **Funktions-Icon-Satz:** 4 neue Icons (Start, Ziel, Settings, Route) im Flat-Comic-Style mit Neon-Grün auf Twitch-Lila — Twitch-Stream-Overlay-Ästhetik.
+- **Design-Stil:** Angelehnt an Flat-Vector/Cartoon-Ästhetik — klare Formen, bold Outlines, keine Gradienten, hohe Erkennbarkeit bei kleinen Größen.
 
 ### v4.2.0 — Fluid Route Selection UI
 
 - **Route Selection Overlay:** Neues Floating-Overlay am unteren Kartenrand zeigt alle berechneten Routen-Alternativen nach der Routenberechnung
 - **Auto-Minimize Sidebar:** Die Sidebar schaltet automatisch in den Kompakt-Modus (nur Icons), um mehr Kartenfläche freizugeben
-- **Dynamisches Highlighting:** Die ausgewählte Route wird farblich hervorgehoben, andere Routen werden ausgegraut
+- **Dynamisches Highlighting:** Die ausgewählte Route wird farblich hervorgehoben (Bold-Blau), andere Routen werden semi-transparent ausgegraut
 - **Map-Fokus:** Die Karte zentriert automatisch alle Routen-Alternativen im Viewport
 - **Smart Start-Button:** "Navigation starten" erscheint erst nach Auswahl einer spezifischen Route
 - **Smooth Animations:** Framer-Motion Slide-Up/Down Animationen für das Overlay
